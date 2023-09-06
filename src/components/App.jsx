@@ -1,66 +1,65 @@
-import { Component } from 'react';
 import { Statictics } from './Statistics/Statistics';
 import { FeedbackOptions } from './FeedbackOptions/FeedbackOptions';
 import { Section } from './Section/Section';
 import { Notification } from './Notification/Notification';
+import { useState } from 'react';
 
-export class App extends Component {
-  state = {
+export const App = () => {
+  const [feedBack, setFeedBack] = useState({
     good: 0,
     neutral: 0,
     bad: 0,
-  };
+  });
 
   //* Оновлює стан, додаючи одиницю до відповідного значення.
-  handleCount = type => {
-    this.setState(prevState => {
+  const handleCount = type => {
+    setFeedBack(prevState => {
       return {
+        ...prevState,
         [type]: prevState[type] + 1,
       };
     });
   };
 
   //* Підраховує загальну кілкість відгуків
-  countTotalFeedback = () => {
-    const { good, neutral, bad } = this.state;
+  const countTotalFeedback = () => {
+    const { good, neutral, bad } = feedBack;
     return good + neutral + bad;
   };
 
   //* Підраховує відсоток хороших
-  countPositiveFeedbackPercentag = () => {
-    const total = this.countTotalFeedback();
+  const countPositiveFeedbackPercentag = () => {
+    const total = countTotalFeedback();
     if (total === 0) {
       return 0;
     }
-    const { good } = this.state;
+    const { good } = feedBack;
     return Math.round((good / total) * 100);
   };
 
-  render() {
-    const totalFeedback = this.countTotalFeedback();
-    const positiveFeedbackPercentage = this.countPositiveFeedbackPercentag();
+  const totalFeedback = countTotalFeedback();
+  const positiveFeedbackPercentage = countPositiveFeedbackPercentag();
 
-    return (
-      <>
-        <Section title="Pleace leave feedback">
-          <FeedbackOptions
-            options={Object.keys(this.state)}
-            onLeaveFeedback={this.handleCount}
+  return (
+    <>
+      <Section title="Pleace leave feedback">
+        <FeedbackOptions
+          options={Object.keys(feedBack)}
+          onLeaveFeedback={handleCount}
+        />
+      </Section>
+
+      <Section title="Statisics">
+        {totalFeedback > 0 ? (
+          <Statictics
+            value={feedBack}
+            totalFeedback={totalFeedback}
+            positiveFeedback={positiveFeedbackPercentage}
           />
-        </Section>
-
-        <Section title="Statisics">
-          {totalFeedback > 0 ? (
-            <Statictics
-              value={this.state}
-              totalFeedback={totalFeedback}
-              positiveFeedback={positiveFeedbackPercentage}
-            />
-          ) : (
-            <Notification message="There is no feedback" />
-          )}
-        </Section>
-      </>
-    );
-  }
-}
+        ) : (
+          <Notification message="There is no feedback" />
+        )}
+      </Section>
+    </>
+  );
+};
