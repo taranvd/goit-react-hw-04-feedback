@@ -5,27 +5,29 @@ import { Notification } from './Notification/Notification';
 import { useState } from 'react';
 
 export const App = () => {
-  const [feedBack, setFeedBack] = useState({
-    good: 0,
-    neutral: 0,
-    bad: 0,
-  });
+  const [good, setGood] = useState(0);
+  const [neutral, setNeutral] = useState(0);
+  const [bad, setBad] = useState(0);
 
   //* Оновлює стан, додаючи одиницю до відповідного значення.
   const handleCount = type => {
-    setFeedBack(prevState => {
-      return {
-        ...prevState,
-        [type]: prevState[type] + 1,
-      };
-    });
+    switch (type) {
+      case 'good':
+        setGood(good + 1);
+        break;
+      case 'neutral':
+        setNeutral(neutral + 1);
+        break;
+      case 'bad':
+        setBad(bad + 1);
+        break;
+      default:
+        break;
+    }
   };
 
   //* Підраховує загальну кілкість відгуків
-  const countTotalFeedback = () => {
-    const { good, neutral, bad } = feedBack;
-    return good + neutral + bad;
-  };
+  const countTotalFeedback = () => good + neutral + bad;
 
   //* Підраховує відсоток хороших
   const countPositiveFeedbackPercentag = () => {
@@ -33,7 +35,6 @@ export const App = () => {
     if (total === 0) {
       return 0;
     }
-    const { good } = feedBack;
     return Math.round((good / total) * 100);
   };
 
@@ -44,7 +45,7 @@ export const App = () => {
     <>
       <Section title="Pleace leave feedback">
         <FeedbackOptions
-          options={Object.keys(feedBack)}
+          options={Object.keys({ good, neutral, bad })}
           onLeaveFeedback={handleCount}
         />
       </Section>
@@ -52,7 +53,7 @@ export const App = () => {
       <Section title="Statisics">
         {totalFeedback > 0 ? (
           <Statictics
-            value={feedBack}
+            value={{ good, neutral, bad }}
             totalFeedback={totalFeedback}
             positiveFeedback={positiveFeedbackPercentage}
           />
